@@ -11,14 +11,19 @@ environment:
   name: production
   url: https://devops-server.intro.codeforall.io
 
-name: Deploy to EC2
-uses: appleboy/ssh-action@v1.0.0
-with:
-  host: ${{ secrets.EC2_HOST }}
-  username: ${{ secrets.EC2_USERNAME }}
-  password: ${{ secrets.EC2_PASSWORD }}
-  script: |
-    docker pull ${{ github.event.inputs.image_reference }}
-    docker stop go-fibonacci-api || true
-    docker rm go-fibonacci-api || true
-    docker run -d --name go-fibonacci-api -p 8082:8080 ${{ github.event.inputs.image_reference }}
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    steps:
+      name: Deploy to EC2
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        password: ${{ secrets.EC2_PASSWORD }}
+        script: |
+          docker pull ${{ github.event.inputs.image_reference }}
+          docker stop go-fibonacci-api || true
+          docker rm go-fibonacci-api || true
+          docker run -d --name go-fibonacci-api -p 8082:8080 ${{ github.event.inputs.image_reference }}
